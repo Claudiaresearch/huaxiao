@@ -3,441 +3,429 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>旅行开支记录</title>
+<meta name="description" content="云南旅行开销，按天记录">
+<title>云南旅行开销</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700&display=swap">
 <style>
   :root{
-    --bg:#F4F5F7;
-    --surface:#FFFFFF;
-    --surface-2:#ECEEF2;
-    --ink:#1A2233;
-    --muted:#667085;
-    --border:#DFE3E9;
-    --accent:#0B7285;
-    --accent-ink:#075E6C;
-    --accent-soft:#E3F2F1;
-    --danger:#B42318;
-    --danger-soft:#FDEDEC;
-    --shadow:0 1px 2px rgba(20,24,33,.04),0 8px 24px -12px rgba(20,24,33,.12);
-    color-scheme:light;
+    --ground:#ffffff;--surface:#f1f5f7;--surface-2:#dfe8ed;
+    --ink:#14232d;--ink-2:#3c525f;--line:#c5d3da;--line-strong:#9fb3bd;
+    --accent:#0A6DA8;--accent-soft:#e2eef7;--gold:#B05E10;--gold-soft:#f6ecdf;
+    --c1:#0A6DA8;--c2:#B05E10;--c3:#6B4EAE;--c4:#1F7A55;--c5:#6E828D;
   }
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){
-      --bg:#12161C; --surface:#1B2129; --surface-2:#232A33; --ink:#E7EAEE; --muted:#99A2AE;
-      --border:#2B323C; --accent:#3FB6C0; --accent-ink:#8FE0E6; --accent-soft:#163338;
-      --danger:#F97066; --danger-soft:#3A1917;
-      --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.5);
-      color-scheme:dark;
+      --ground:#0f171c;--surface:#18242b;--surface-2:#22323a;
+      --ink:#eaf1f4;--ink-2:#b2c4cd;--line:#31454e;--line-strong:#4a6572;
+      --accent:#3AA0CF;--accent-soft:#122c3a;--gold:#C07E2E;--gold-soft:#2b2015;
+      --c1:#3AA0CF;--c2:#C07E2E;--c3:#8E82D6;--c4:#3F9E74;--c5:#8296A1;
     }
   }
   :root[data-theme="dark"]{
-    --bg:#12161C; --surface:#1B2129; --surface-2:#232A33; --ink:#E7EAEE; --muted:#99A2AE;
-    --border:#2B323C; --accent:#3FB6C0; --accent-ink:#8FE0E6; --accent-soft:#163338;
-    --danger:#F97066; --danger-soft:#3A1917;
-    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.5);
-    color-scheme:dark;
+    --ground:#0f171c;--surface:#18242b;--surface-2:#22323a;
+    --ink:#eaf1f4;--ink-2:#b2c4cd;--line:#31454e;--line-strong:#4a6572;
+    --accent:#3AA0CF;--accent-soft:#122c3a;--gold:#C07E2E;--gold-soft:#2b2015;
+    --c1:#3AA0CF;--c2:#C07E2E;--c3:#8E82D6;--c4:#3F9E74;--c5:#8296A1;
   }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+    font-size:17px;line-height:1.7;-webkit-text-size-adjust:100%}
+  .wrap{max-width:720px;margin:0 auto;padding-inline:18px;padding-block:22px 72px}
+  h1,h2{font-family:"Noto Serif SC","Songti SC",serif;margin:0;line-height:1.35;text-wrap:balance}
+  p{margin:0}
+  .num{font-variant-numeric:tabular-nums}
 
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;background:var(--bg);}
-  body{
-    padding:22px 18px 56px;
-    padding-top:calc(22px + env(safe-area-inset-top, 0px));
-    padding-bottom:calc(56px + env(safe-area-inset-bottom, 0px));
-    color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Helvetica Neue',Arial,sans-serif;
-    -webkit-font-smoothing:antialiased;
-  }
-  .num{font-variant-numeric:tabular-nums;}
+  header{padding-bottom:18px;border-bottom:3px solid var(--ink)}
+  .eyebrow{font-size:.78em;letter-spacing:.16em;color:var(--ink-2)}
+  h1{margin-top:6px;font-size:1.7em;font-weight:700}
+  .total{margin-top:14px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .total .v{font-family:"Noto Serif SC",serif;font-size:2em;font-weight:700;color:var(--accent)}
+  .total .k{font-size:.85em;color:var(--ink-2)}
 
-  .page{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:16px;}
+  section{margin-top:32px}
+  h2{font-size:1.12em;font-weight:700;padding-bottom:10px;border-bottom:2px solid var(--line)}
+  .hint{margin-top:10px;font-size:.8em;color:var(--ink-2)}
 
-  .hero{
-    background:linear-gradient(155deg,var(--accent-soft),var(--surface) 62%);
-    border:1px solid var(--border); border-radius:20px; padding:20px 20px 18px; box-shadow:var(--shadow);
-  }
-  .eyebrow{margin:0 0 4px;font-size:12.5px;letter-spacing:.06em;color:var(--accent-ink);font-weight:600;text-transform:uppercase;}
-  h1{margin:0;font-size:clamp(22px,5vw,28px);font-weight:800;letter-spacing:-.01em;line-height:1.2;outline:none;}
-  h1:focus{background:var(--surface);border-radius:6px;box-shadow:0 0 0 2px var(--accent);}
+  .legend{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px 14px;font-size:.8em}
+  .lg{display:flex;align-items:center;gap:7px}
+  .sw{width:14px;height:14px;border-radius:4px;flex:0 0 auto}
 
-  .summary-grid{margin-top:16px;display:grid;grid-template-columns:1.3fr 1fr;gap:10px;}
-  .stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 14px 13px;min-width:0;}
-  .stat-label{font-size:11.5px;color:var(--muted);margin:0 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .stat-value{font-size:24px;font-weight:800;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .stat-sub{font-size:11px;color:var(--muted);margin-top:3px;}
-  @media (max-width:480px){ .summary-grid{grid-template-columns:1fr 1fr;} }
+  .dayrows{margin-top:14px;display:flex;flex-direction:column;gap:14px}
+  .drow .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:.84em}
+  .drow .top b{font-weight:700}
+  .drow .top .amt{color:var(--ink-2)}
+  .track{margin-top:6px;display:flex;gap:2px;height:26px;border-radius:7px;overflow:hidden;background:var(--surface-2)}
+  .seg{display:flex;align-items:center;justify-content:center;min-width:0;
+    font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden}
+  .track.empty{align-items:center;padding-left:10px}
+  .track.empty span{font-size:.72em;color:var(--ink-2)}
 
-  .breakdown{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
-  .bd-row{display:grid;grid-template-columns:64px 1fr 74px;align-items:center;gap:10px;font-size:12.5px;}
-  .bd-name{color:var(--ink);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .bd-bar-track{height:7px;border-radius:99px;background:var(--surface-2);overflow:hidden;}
-  .bd-bar-fill{height:100%;background:var(--accent);border-radius:99px;}
-  .bd-amt{text-align:right;color:var(--muted);}
+  .chart{margin-top:14px;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:16px 14px 10px}
+  svg{display:block;width:100%;height:auto;overflow:visible}
 
-  .form-panel{
-    background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow);
-    display:flex;flex-direction:column;gap:12px;
-  }
-  .form-panel[hidden]{display:none;}
-  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  .field{display:flex;flex-direction:column;gap:5px;min-width:0;}
-  .field label{font-size:12px;color:var(--muted);font-weight:600;}
-  .field input{
-    font:inherit;font-size:16px;padding:9px 10px;border-radius:9px;border:1px solid var(--border);
-    background:var(--bg);color:var(--ink);width:100%;
-  }
-  .field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
-  .form-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;}
-  @media (max-width:480px){ .field-row{grid-template-columns:1fr;} }
+  .toolbar{margin-top:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .btn{font:inherit;font-size:.92em;font-weight:700;padding:10px 16px;min-height:44px;border-radius:12px;
+    border:1.5px solid var(--line-strong);background:var(--ground);color:var(--ink);cursor:pointer}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.quiet{border-color:transparent;color:var(--ink-2)}
+  .btn.danger{background:var(--gold-soft);border-color:var(--gold);color:var(--gold)}
+  .btn.small{font-size:.82em;padding:8px 12px;min-height:38px}
+  .btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 
-  .btn{
-    font:inherit;font-size:14px;font-weight:600;padding:9px 14px;border-radius:10px;border:1px solid var(--border);
-    background:var(--surface);color:var(--ink);cursor:pointer;
-  }
-  .btn:hover{border-color:var(--accent);}
-  .btn-primary{background:var(--accent);border-color:var(--accent);color:#fff;}
-  .btn-primary:hover{filter:brightness(1.05);}
-  .btn-ghost{background:transparent;border-color:transparent;color:var(--muted);}
-  .btn-ghost:hover{color:var(--danger);}
-  .btn-danger{background:var(--danger-soft);border-color:var(--danger-soft);color:var(--danger);}
+  form{margin-top:14px;padding:18px;border-radius:16px;background:var(--surface);border:1.5px solid var(--line);
+    display:flex;flex-direction:column;gap:12px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .f{display:flex;flex-direction:column;gap:5px;min-width:0}
+  .f label{font-size:.8em;font-weight:700;color:var(--ink-2)}
+  .f input,.f select{font:inherit;font-size:16px;padding:10px;border-radius:10px;
+    border:1.5px solid var(--line);background:var(--ground);color:var(--ink);width:100%}
+  .f input:focus,.f select:focus{outline:none;border-color:var(--accent)}
+  .acts{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
 
-  .toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
-  .chips{display:flex;gap:6px;flex-wrap:wrap;}
-  .chip{
-    font-size:12.5px;font-weight:600;padding:6px 12px;border-radius:999px;border:1px solid var(--border);
-    background:var(--surface);color:var(--muted);cursor:pointer;white-space:nowrap;
-  }
-  .chip.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .day{margin-top:22px}
+  .dhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-bottom:8px;border-bottom:2px solid var(--line)}
+  .dhead .d{font-family:"Noto Serif SC",serif;font-size:1.05em;font-weight:700;color:var(--accent)}
+  .dhead .w{font-size:.78em;color:var(--ink-2);flex:1}
+  .dhead .s{font-weight:700}
+  .items{display:flex;flex-direction:column}
+  .item{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;
+    padding:12px 2px;border-bottom:1px solid var(--line);cursor:pointer;text-align:left;
+    background:none;border-left:0;border-right:0;border-top:0;font:inherit;color:inherit;width:100%}
+  .item .cat{font-size:.72em;font-weight:700;padding:3px 10px;border-radius:999px;color:#fff;white-space:nowrap}
+  .item .nm{min-width:0}
+  .item .nm b{font-weight:700}
+  .item .nm span{display:block;font-size:.8em;color:var(--ink-2)}
+  .item .amt{font-weight:700;white-space:nowrap}
+  .none{padding:11px 2px;font-size:.85em;color:var(--ink-2)}
 
-  .table-wrap{
-    background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);
-    overflow-x:auto;
-  }
-  table{border-collapse:collapse;width:100%;min-width:480px;}
-  thead th{
-    text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);
-    padding:12px 14px;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:700;
-  }
-  thead th.num-col,tbody td.num-col{text-align:right;}
-  tbody td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:middle;}
-  tbody tr:last-child td{border-bottom:none;}
-  tbody tr:hover{background:var(--bg);}
-  .cat-badge{
-    display:inline-block;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;
-    background:var(--accent-soft);color:var(--accent-ink);white-space:nowrap;
-  }
-  .row-actions{display:flex;gap:4px;justify-content:flex-end;}
-  .row-actions button{
-    border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:13px;padding:4px 6px;border-radius:6px;
-  }
-  .row-actions button:hover{color:var(--accent);background:var(--accent-soft);}
-  .row-actions button.del:hover{color:var(--danger);background:var(--danger-soft);}
-  tfoot td{padding:12px 14px;font-weight:700;border-top:2px solid var(--border);font-size:14px;}
+  .later{margin-top:32px;padding:18px 20px;border-radius:16px;background:var(--gold-soft);border-left:7px solid var(--gold)}
+  .later h2{font-size:1em;font-weight:700;color:var(--gold);border:0;padding:0}
+  .later ul{margin:8px 0 0;padding-left:1.2em;font-size:.86em;color:var(--ink-2)}
+  .later li{margin-top:4px}
 
-  .empty-state{
-    text-align:center;color:var(--muted);font-size:14px;padding:36px 20px;background:var(--surface);
-    border:1px dashed var(--border);border-radius:16px;
-  }
-  .hint{font-size:12px;color:var(--muted);margin:2px 0 0;}
-  .footnote{text-align:center;font-size:11.5px;color:var(--muted);margin-top:4px;}
-  [hidden]{display:none!important;}
+  .backup{margin-top:28px;padding:16px 18px;border-radius:14px;background:var(--surface);border:1.5px solid var(--line)}
+  .backup h2{font-size:.98em;border:0;padding:0}
+  .backup .bbtns{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+  .backup p{margin-top:8px;font-size:.8em;color:var(--ink-2)}
+  footer{margin-top:30px;padding-top:16px;border-top:1.5px solid var(--line);font-size:.78em;color:var(--ink-2)}
+  @media (max-width:460px){ .row{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
-<div class="page">
-  <header class="hero">
-    <p class="eyebrow">旅行开支</p>
-    <h1 id="tripTitle" contenteditable="true" spellcheck="false"></h1>
-    <div class="summary-grid" id="summaryGrid"></div>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">2026 年 10 月 14 – 18 日 · 两个人</p>
+    <h1>云南旅行开销</h1>
+    <div class="total">
+      <span class="v num" id="total">¥0</span>
+      <span class="k" id="totalSub">还没有记录</span>
+    </div>
   </header>
 
-  <section class="toolbar">
-    <div class="chips" id="categoryChips"></div>
-    <button class="btn btn-primary" id="addBtn">+ 记一笔</button>
+  <section>
+    <h2>每天各类占比</h2>
+    <div class="legend" id="legend"></div>
+    <div class="dayrows" id="dayrows"></div>
+    <p class="hint">每条是那一天的 100%，宽度就是各类占的比例；点住色块能看到金额。</p>
   </section>
 
-  <section class="form-panel" id="formPanel" hidden>
-    <div class="field-row">
-      <div class="field">
-        <label for="fDate">日期</label>
-        <input id="fDate" type="date">
-      </div>
-      <div class="field">
-        <label for="fCategory">类别</label>
-        <input id="fCategory" type="text" list="categoryOptions" placeholder="如：交通">
-        <datalist id="categoryOptions">
-          <option value="交通"><option value="住宿"><option value="餐饮">
-          <option value="门票"><option value="购物"><option value="其他">
-        </datalist>
-      </div>
-    </div>
-    <div class="field-row">
-      <div class="field">
-        <label for="fItem">项目</label>
-        <input id="fItem" type="text" placeholder="如：机票">
-      </div>
-      <div class="field">
-        <label for="fAmount">金额（¥）</label>
-        <input id="fAmount" type="number" step="0.01" min="0" inputmode="decimal" class="num" placeholder="0.00">
-      </div>
-    </div>
-    <div class="field">
-      <label for="fNote">备注（可选）</label>
-      <input id="fNote" type="text" placeholder="选填">
-    </div>
-    <div class="form-actions">
-      <button class="btn btn-danger" id="formDelete" hidden>删除这笔</button>
-      <button class="btn btn-ghost" id="formCancel">取消</button>
-      <button class="btn btn-primary" id="formSave">保存</button>
-    </div>
+  <section>
+    <h2>累计花费趋势</h2>
+    <div class="chart"><svg id="trend" viewBox="0 0 340 150" role="img" aria-label="累计花费趋势"></svg></div>
+    <p class="hint">按出行日期累加，最后一个点就是目前的总数。</p>
   </section>
 
-  <section class="table-wrap" id="tableWrap" hidden>
-    <table>
-      <thead>
-        <tr><th>日期</th><th>类别</th><th>项目</th><th class="num-col">金额</th><th></th></tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-      <tfoot id="tableFoot"></tfoot>
-    </table>
+  <section>
+    <h2>明细</h2>
+    <div class="toolbar">
+      <span style="font-size:.85em;color:var(--ink-2)">只记已经付掉或已经订好的</span>
+      <button class="btn primary" id="addBtn" type="button">+ 记一笔</button>
+    </div>
+
+    <form id="form" hidden autocomplete="off">
+      <div class="row">
+        <div class="f">
+          <label for="fDate">哪一天</label>
+          <select id="fDate"></select>
+        </div>
+        <div class="f">
+          <label for="fCat">类别</label>
+          <input id="fCat" list="cats" placeholder="如：交通">
+          <datalist id="cats">
+            <option value="交通"><option value="住宿"><option value="门票"><option value="餐饮"><option value="旅拍"><option value="其他">
+          </datalist>
+        </div>
+      </div>
+      <div class="row">
+        <div class="f">
+          <label for="fItem">项目</label>
+          <input id="fItem" placeholder="如：机票">
+        </div>
+        <div class="f">
+          <label for="fAmt">金额（元）</label>
+          <input id="fAmt" type="number" step="0.01" min="0" class="num" placeholder="0">
+        </div>
+      </div>
+      <div class="f">
+        <label for="fNote">备注（可不填）</label>
+        <input id="fNote" placeholder="选填">
+      </div>
+      <div class="acts">
+        <button class="btn danger" id="fDel" type="button" hidden>删除</button>
+        <button class="btn quiet" id="fCancel" type="button">取消</button>
+        <button class="btn primary" id="fSave" type="button">保存</button>
+      </div>
+    </form>
+
+    <div id="days"></div>
   </section>
 
-  <p class="empty-state" id="emptyState" hidden>还没有记录，点击上方"记一笔"开始。</p>
-  <p class="footnote">数据保存在这台设备的浏览器里，仅本机可见</p>
+  <section class="later">
+    <h2>还没发生的，暂时不算进去</h2>
+    <ul>
+      <li>携程 16–17 两天的团费（用车、飞来寺住宿、门票）</li>
+      <li>白沙民宿 1 晚、香格里拉 2 晚</li>
+      <li>玉龙雪山门票和云杉坪索道、15 号在丽江的包车</li>
+      <li>18 号的藏服旅拍、市内打车</li>
+      <li>每天吃饭、托运行李、特产</li>
+    </ul>
+  </section>
+
+  <section class="backup">
+    <h2>备份与恢复</h2>
+    <div class="bbtns">
+      <button class="btn small" id="expBtn" type="button">导出备份</button>
+      <button class="btn small" id="impBtn" type="button">导入备份</button>
+      <input id="impFile" type="file" accept="application/json,.json" hidden>
+    </div>
+    <p id="backupMsg">记录只存在这部手机的浏览器里。换手机或清缓存前，先导出一份备份文件存好。</p>
+  </section>
+
+  <footer>付掉一笔就记一笔，点已有的记录可以改或删。每记一笔，上面两张图会立刻跟着变。</footer>
 </div>
 
 <script>
 (function(){
-  var STORAGE_KEY = 'trip-expense-tracker-v1';
+  var KEY='yunnan-expenses-v1';
+  var DAYS=[
+    {d:'2026-10-14',label:'10/14 周三',w:'上海出发，深夜到丽江'},
+    {d:'2026-10-15',label:'10/15 周四',w:'玉龙雪山，高铁去香格里拉'},
+    {d:'2026-10-16',label:'10/16 周五',w:'松赞林寺，住梅里'},
+    {d:'2026-10-17',label:'10/17 周六',w:'日照金山、普达措'},
+    {d:'2026-10-18',label:'10/18 周日',w:'旅拍，回丽江飞上海'}
+  ];
+  var SEED=[
+    {date:'2026-10-14',category:'交通',item:'机票（去程）',amount:1559,note:'两人往返共 3118（含行李额），去返各摊一半'},
+    {date:'2026-10-14',category:'交通',item:'上海送机',amount:99,note:'已预约'},
+    {date:'2026-10-15',category:'交通',item:'高铁 D239 丽江—香格里拉',amount:126,note:'两人'},
+    {date:'2026-10-18',category:'交通',item:'机票（返程）',amount:1559,note:'两人往返共 3118（含行李额），去返各摊一半'},
+    {date:'2026-10-18',category:'交通',item:'高铁 C986 香格里拉—丽江',amount:140,note:'两人'},
+    {date:'2026-10-18',category:'交通',item:'上海接机',amount:99,note:'已预约'}
+  ];
+  var HUES=['var(--c1)','var(--c2)','var(--c3)','var(--c4)'], OTHER='var(--c5)';
+  var rows=[], editing=null, catColor={}, catOrder=[];
+  var $=function(i){return document.getElementById(i);};
+  var form=$('form');
 
-  // 首次打开时的初始数据（来自你已经记录的交通费用）；之后的增删改都只会写入本机浏览器存储。
-  var seedState = {
-    title: '旅行开支记录',
-    expenses: [
-      {id:'exp1', date:'2026-09-22', category:'交通', item:'机票', amount:1688, note:'', createdAt:'2026-09-22T00:00:01.000Z'},
-      {id:'exp2', date:'2026-09-22', category:'交通', item:'机票', amount:1430, note:'', createdAt:'2026-09-22T00:00:02.000Z'},
-      {id:'exp3', date:'2026-09-22', category:'交通', item:'高铁', amount:126,  note:'', createdAt:'2026-09-22T00:00:03.000Z'},
-      {id:'exp4', date:'2026-09-22', category:'交通', item:'高铁', amount:140,  note:'', createdAt:'2026-09-22T00:00:04.000Z'},
-      {id:'exp5', date:'2026-09-22', category:'交通', item:'接机', amount:99,   note:'', createdAt:'2026-09-22T00:00:05.000Z'},
-      {id:'exp6', date:'2026-09-22', category:'交通', item:'接机', amount:99,   note:'', createdAt:'2026-09-22T00:00:06.000Z'}
-    ]
-  };
+  DAYS.forEach(function(x){
+    var o=document.createElement('option'); o.value=x.d; o.textContent=x.label; $('fDate').appendChild(o);
+  });
 
-  var state = loadState();
-  var currentFilter = '全部';
-  var editingId = null;
-
-  var el = {
-    title: document.getElementById('tripTitle'),
-    summaryGrid: document.getElementById('summaryGrid'),
-    chips: document.getElementById('categoryChips'),
-    addBtn: document.getElementById('addBtn'),
-    formPanel: document.getElementById('formPanel'),
-    fDate: document.getElementById('fDate'),
-    fCategory: document.getElementById('fCategory'),
-    fItem: document.getElementById('fItem'),
-    fAmount: document.getElementById('fAmount'),
-    fNote: document.getElementById('fNote'),
-    formSave: document.getElementById('formSave'),
-    formCancel: document.getElementById('formCancel'),
-    formDelete: document.getElementById('formDelete'),
-    tableWrap: document.getElementById('tableWrap'),
-    tableBody: document.getElementById('tableBody'),
-    tableFoot: document.getElementById('tableFoot'),
-    emptyState: document.getElementById('emptyState'),
-  };
-
-  function loadState(){
-    try{
-      var raw = localStorage.getItem(STORAGE_KEY);
-      if (raw){
-        var parsed = JSON.parse(raw);
-        if (parsed && Array.isArray(parsed.expenses)) return parsed;
-      }
-    }catch(err){ console.error(err); }
-    return JSON.parse(JSON.stringify(seedState));
-  }
-
-  function saveState(){
-    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-    catch(err){ console.error(err); }
-  }
-
-  function fmtMoney(n){
-    n = Number(n)||0;
-    return '¥' + n.toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
-  }
-  function todayStr(){
-    var d = new Date();
-    var m = String(d.getMonth()+1).padStart(2,'0');
-    var day = String(d.getDate()).padStart(2,'0');
-    return d.getFullYear()+'-'+m+'-'+day;
-  }
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, function(c){
-      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  function load(){
+    var raw=null;
+    try{ raw=localStorage.getItem(KEY); }catch(e){}
+    if(raw){
+      try{ var d=JSON.parse(raw); if(Array.isArray(d)) { rows=d; return; } }catch(e){}
+    }
+    rows=SEED.map(function(r,i){
+      return {id:'s'+i, date:r.date, category:r.category, item:r.item, amount:r.amount, note:r.note, createdAt:'2026-09-22T00:00:0'+i+'.000Z'};
     });
+    save();
   }
-  function uid(){ return 'exp_' + Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
-
-  function renderHeader(){
-    if (el.title.textContent !== state.title) el.title.textContent = state.title;
+  function save(){
+    try{ localStorage.setItem(KEY, JSON.stringify(rows)); }
+    catch(e){ $('backupMsg').textContent='这个浏览器不让存数据（可能是无痕模式），刷新后记录会丢，请先导出备份。'; }
   }
+  function money(n){n=Number(n)||0;return '¥'+n.toLocaleString('zh-CN',{maximumFractionDigits:0});}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function catOf(r){return r.category||'其他';}
 
-  function renderSummary(){
-    var expenses = state.expenses;
-    var total = expenses.reduce(function(s,e){ return s + (Number(e.amount)||0); }, 0);
-    var byCat = {};
-    expenses.forEach(function(e){
-      var c = e.category || '其他';
-      byCat[c] = (byCat[c]||0) + (Number(e.amount)||0);
-    });
-    var cats = Object.keys(byCat).sort(function(a,b){ return byCat[b]-byCat[a]; });
-
-    var bdHtml = cats.map(function(c){
-      var pct = total > 0 ? Math.round(byCat[c]/total*100) : 0;
-      return '<div class="bd-row">' +
-        '<span class="bd-name">' + escapeHtml(c) + '</span>' +
-        '<span class="bd-bar-track"><span class="bd-bar-fill" style="width:' + pct + '%"></span></span>' +
-        '<span class="bd-amt num">' + fmtMoney(byCat[c]) + '</span>' +
-      '</div>';
+  function computeColors(){
+    var by={};
+    rows.forEach(function(r){var c=catOf(r);by[c]=(by[c]||0)+(Number(r.amount)||0);});
+    catOrder=Object.keys(by).sort(function(a,b){return by[b]-by[a];});
+    catColor={};
+    catOrder.forEach(function(c,i){catColor[c]= i<HUES.length?HUES[i]:OTHER;});
+    return by;
+  }
+  function renderLegend(by){
+    var shown=catOrder.slice(0,HUES.length), merged=catOrder.slice(HUES.length);
+    var html=shown.map(function(c){
+      return '<span class="lg"><span class="sw" style="background:'+catColor[c]+'"></span>'+esc(c)+
+        ' <span class="num" style="color:var(--ink-2)">'+money(by[c])+'</span></span>';
     }).join('');
-
-    el.summaryGrid.innerHTML =
-      '<div class="stat"><p class="stat-label">总花费</p><p class="stat-value num">' + fmtMoney(total) + '</p>' +
-        '<p class="stat-sub">共 ' + expenses.length + ' 笔</p>' +
-      '</div>' +
-      '<div class="stat"><p class="stat-label">分类占比</p>' +
-        (bdHtml ? '<div class="breakdown">' + bdHtml + '</div>' : '<p class="stat-sub">暂无记录</p>') +
-      '</div>';
-  }
-
-  function renderChips(){
-    var cats = [];
-    state.expenses.forEach(function(e){ if (e.category && cats.indexOf(e.category)===-1) cats.push(e.category); });
-    var all = ['全部'].concat(cats);
-    if (all.indexOf(currentFilter) === -1) currentFilter = '全部';
-    el.chips.innerHTML = '';
-    all.forEach(function(cat){
-      var b = document.createElement('button');
-      b.className = 'chip' + (cat===currentFilter ? ' active' : '');
-      b.textContent = cat;
-      b.onclick = function(){ currentFilter = cat; renderChips(); renderTable(); };
-      el.chips.appendChild(b);
-    });
-  }
-
-  function renderTable(){
-    var expenses = state.expenses;
-    var rows = expenses.filter(function(e){ return currentFilter==='全部' || e.category===currentFilter; });
-    rows = rows.slice().sort(function(a,b){
-      if (a.date !== b.date) return (a.date||'').localeCompare(b.date||'');
-      return (a.createdAt||'').localeCompare(b.createdAt||'');
-    });
-
-    el.tableWrap.hidden = expenses.length === 0;
-    el.emptyState.hidden = expenses.length !== 0;
-
-    el.tableBody.innerHTML = '';
-    rows.forEach(function(e){
-      var tr = document.createElement('tr');
-      tr.innerHTML =
-        '<td>' + escapeHtml(e.date||'') + '</td>' +
-        '<td><span class="cat-badge">' + escapeHtml(e.category||'其他') + '</span></td>' +
-        '<td>' + escapeHtml(e.item||'') + (e.note ? '<div class="hint">'+escapeHtml(e.note)+'</div>' : '') + '</td>' +
-        '<td class="num-col num">' + fmtMoney(e.amount) + '</td>' +
-        '<td><div class="row-actions">' +
-          '<button class="edit" title="编辑">编辑</button>' +
-          '<button class="del" title="删除">删除</button>' +
-        '</div></td>';
-      tr.querySelector('.edit').onclick = function(){ openForm(e); };
-      tr.querySelector('.del').onclick = function(){ deleteExpense(e.id); };
-      el.tableBody.appendChild(tr);
-    });
-
-    var totalAmt = rows.reduce(function(s,e){ return s + (Number(e.amount)||0); },0);
-    if (rows.length){
-      el.tableFoot.innerHTML =
-        '<tr><td colspan="3">合计（' + rows.length + ' 笔）</td>' +
-        '<td class="num-col num">' + fmtMoney(totalAmt) + '</td><td></td></tr>';
-    } else {
-      el.tableFoot.innerHTML = '';
+    if(merged.length){
+      var sum=merged.reduce(function(s,c){return s+by[c];},0);
+      html+='<span class="lg"><span class="sw" style="background:'+OTHER+'"></span>其他（'+esc(merged.join('、'))+
+        '） <span class="num" style="color:var(--ink-2)">'+money(sum)+'</span></span>';
     }
+    $('legend').innerHTML=html||'<span style="color:var(--ink-2)">还没有记录</span>';
+  }
+  function renderDayBars(){
+    var box=$('dayrows'); box.innerHTML='';
+    DAYS.forEach(function(g){
+      var list=rows.filter(function(r){return r.date===g.d;});
+      var sum=list.reduce(function(s,r){return s+(Number(r.amount)||0);},0);
+      var by={}; list.forEach(function(r){var c=catOf(r);by[c]=(by[c]||0)+(Number(r.amount)||0);});
+      var cats=Object.keys(by).sort(function(a,b){return by[b]-by[a];});
+      var segs= sum>0 ? cats.map(function(c){
+        var pct=by[c]/sum*100, label= pct>=14?Math.round(pct)+'%':'';
+        return '<span class="seg" style="flex:'+pct.toFixed(3)+' 1 0;background:'+catColor[c]+'" title="'+
+          esc(c)+'　'+money(by[c])+'　'+Math.round(pct)+'%">'+label+'</span>';
+      }).join('') : '';
+      var div=document.createElement('div'); div.className='drow';
+      div.innerHTML='<div class="top"><b>'+esc(g.label)+'</b><span class="amt num">'+
+        (sum>0?money(sum):'这天还没有花销')+'</span></div>'+
+        (sum>0?'<div class="track">'+segs+'</div>':'<div class="track empty"><span>—</span></div>');
+      box.appendChild(div);
+    });
+  }
+  function renderTrend(){
+    var W=340,H=150,L=44,R=10,T=14,B=26, cum=0;
+    var pts=DAYS.map(function(g){
+      var s=rows.filter(function(r){return r.date===g.d;}).reduce(function(a,r){return a+(Number(r.amount)||0);},0);
+      cum+=s; return {label:g.label.slice(0,5), v:cum, day:s};
+    });
+    var max=Math.max(1, pts[pts.length-1].v), step=(W-L-R)/(DAYS.length-1);
+    function x(i){return L+i*step;}
+    function y(v){return H-B-(v/max)*(H-T-B);}
+    var line=pts.map(function(p,i){return (i?'L':'M')+x(i).toFixed(1)+' '+y(p.v).toFixed(1);}).join(' ');
+    var area=line+' L'+x(pts.length-1).toFixed(1)+' '+(H-B)+' L'+x(0).toFixed(1)+' '+(H-B)+' Z';
+    var g='';
+    g+='<line x1="'+L+'" y1="'+(H-B)+'" x2="'+(W-R)+'" y2="'+(H-B)+'" stroke="var(--line)" stroke-width="1"/>';
+    g+='<line x1="'+L+'" y1="'+y(max).toFixed(1)+'" x2="'+(W-R)+'" y2="'+y(max).toFixed(1)+'" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 3"/>';
+    g+='<text x="'+(L-6)+'" y="'+(y(max)+4).toFixed(1)+'" text-anchor="end" font-size="9" fill="var(--ink-2)">'+money(max)+'</text>';
+    g+='<text x="'+(L-6)+'" y="'+(H-B+4)+'" text-anchor="end" font-size="9" fill="var(--ink-2)">¥0</text>';
+    g+='<path d="'+area+'" fill="var(--accent)" fill-opacity="0.12"/>';
+    g+='<path d="'+line+'" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+    pts.forEach(function(p,i){
+      var last=i===pts.length-1;
+      g+='<circle cx="'+x(i).toFixed(1)+'" cy="'+y(p.v).toFixed(1)+'" r="'+(last?4.5:3.5)+
+        '" fill="var(--accent)" stroke="var(--ground)" stroke-width="2"><title>'+esc(p.label)+
+        '　当天 '+money(p.day)+'　累计 '+money(p.v)+'</title></circle>';
+      g+='<text x="'+x(i).toFixed(1)+'" y="'+(H-B+15)+'" text-anchor="middle" font-size="9" fill="var(--ink-2)">'+esc(p.label)+'</text>';
+    });
+    var lp=pts[pts.length-1];
+    g+='<text x="'+(W-R)+'" y="'+Math.max(T+8,y(lp.v)-8).toFixed(1)+'" text-anchor="end" font-size="11" font-weight="700" fill="var(--ink)">'+money(lp.v)+'</text>';
+    $('trend').innerHTML=g;
+  }
+  function renderDetail(){
+    var box=$('days'); box.innerHTML='';
+    var known={}; DAYS.forEach(function(x){known[x.d]=1;});
+    var others=rows.filter(function(r){return !known[r.date];});
+    var groups=DAYS.concat(others.length?[{d:'__other',label:'其他日期',w:''}]:[]);
+    groups.forEach(function(g){
+      var list= g.d==='__other'?others:rows.filter(function(r){return r.date===g.d;});
+      list.sort(function(a,b){return String(a.createdAt||'').localeCompare(String(b.createdAt||''));});
+      var sum=list.reduce(function(s,r){return s+(Number(r.amount)||0);},0);
+      var sec=document.createElement('div'); sec.className='day';
+      sec.innerHTML='<div class="dhead"><span class="d">'+esc(g.label)+'</span><span class="w">'+esc(g.w)+
+        '</span><span class="s num">'+(list.length?money(sum):'—')+'</span></div><div class="items"></div>';
+      var items=sec.querySelector('.items');
+      if(!list.length){
+        var p=document.createElement('p'); p.className='none'; p.textContent='这天还没有花销'; items.appendChild(p);
+      } else {
+        list.forEach(function(r){
+          var b=document.createElement('button'); b.type='button'; b.className='item';
+          b.innerHTML='<span class="cat" style="background:'+(catColor[catOf(r)]||OTHER)+'">'+esc(catOf(r))+'</span>'+
+            '<span class="nm"><b>'+esc(r.item)+'</b>'+(r.note?'<span>'+esc(r.note)+'</span>':'')+'</span>'+
+            '<span class="amt num">'+money(r.amount)+'</span>';
+          b.onclick=function(){openForm(r);};
+          items.appendChild(b);
+        });
+      }
+      box.appendChild(sec);
+    });
+  }
+  function render(){
+    var by=computeColors();
+    var total=rows.reduce(function(s,r){return s+(Number(r.amount)||0);},0);
+    $('total').textContent=money(total);
+    $('totalSub').textContent= rows.length?('已付 '+rows.length+' 笔'):'还没有记录';
+    renderLegend(by); renderDayBars(); renderTrend(); renderDetail();
   }
 
-  function renderAll(){
-    renderHeader();
-    renderSummary();
-    renderChips();
-    renderTable();
+  function openForm(r){
+    editing=r?r.id:null;
+    $('fDate').value=r?r.date:DAYS[0].d;
+    $('fCat').value=r?(r.category||''):'';
+    $('fItem').value=r?(r.item||''):'';
+    $('fAmt').value=r?r.amount:'';
+    $('fNote').value=r?(r.note||''):'';
+    $('fDel').hidden=!r;
+    form.hidden=false;
+    $('fItem').focus();
   }
+  function closeForm(){form.hidden=true;editing=null;}
 
-  // ---- form (add / edit) ----
-  function openForm(existing){
-    editingId = existing ? existing.id : null;
-    el.fDate.value = existing ? existing.date : todayStr();
-    el.fCategory.value = existing ? existing.category : '';
-    el.fItem.value = existing ? existing.item : '';
-    el.fAmount.value = existing ? existing.amount : '';
-    el.fNote.value = existing ? (existing.note||'') : '';
-    el.formDelete.hidden = !existing;
-    el.formPanel.hidden = false;
-    el.fItem.focus();
-  }
-  function closeForm(){
-    el.formPanel.hidden = true;
-    editingId = null;
-  }
-
-  function saveForm(){
-    var data = {
-      date: el.fDate.value || todayStr(),
-      category: (el.fCategory.value||'其他').trim(),
-      item: (el.fItem.value||'').trim(),
-      amount: Math.round((Number(el.fAmount.value)||0) * 100) / 100,
-      note: (el.fNote.value||'').trim(),
+  $('addBtn').onclick=function(){openForm(null);};
+  $('fCancel').onclick=closeForm;
+  $('fSave').onclick=function(){
+    var data={
+      date:$('fDate').value,
+      category:($('fCat').value||'其他').trim(),
+      item:($('fItem').value||'').trim(),
+      amount:Math.round((Number($('fAmt').value)||0)*100)/100,
+      note:($('fNote').value||'').trim()
     };
-    if (!data.item || !data.amount){
-      el.fItem.focus();
-      return;
-    }
-    if (editingId){
-      var idx = state.expenses.findIndex(function(e){ return e.id===editingId; });
-      if (idx >= 0) state.expenses[idx] = Object.assign({}, state.expenses[idx], data);
+    if(!data.item||!data.amount){$('fItem').focus();return;}
+    if(editing){
+      rows=rows.map(function(r){ return r.id===editing ? Object.assign({},r,data) : r; });
     } else {
-      data.id = uid();
-      data.createdAt = new Date().toISOString();
-      state.expenses.push(data);
+      data.id='x'+Date.now()+Math.random().toString(36).slice(2,6);
+      data.createdAt=new Date().toISOString();
+      rows.push(data);
     }
-    saveState();
-    closeForm();
-    renderAll();
-  }
+    save(); closeForm(); render();
+  };
+  $('fDel').onclick=function(){
+    if(!editing) return;
+    rows=rows.filter(function(r){return r.id!==editing;});
+    save(); closeForm(); render();
+  };
 
-  function deleteExpense(id){
-    state.expenses = state.expenses.filter(function(e){ return e.id !== id; });
-    saveState();
-    if (editingId === id) closeForm();
-    renderAll();
-  }
+  $('expBtn').onclick=function(){
+    var blob=new Blob([JSON.stringify(rows,null,2)],{type:'application/json'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='云南开销备份-'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1000);
+  };
+  $('impBtn').onclick=function(){ $('impFile').click(); };
+  $('impFile').onchange=function(ev){
+    var f=ev.target.files&&ev.target.files[0];
+    if(!f) return;
+    var fr=new FileReader();
+    fr.onload=function(){
+      try{
+        var d=JSON.parse(fr.result);
+        if(!Array.isArray(d)) throw 0;
+        rows=d; save(); render();
+        $('backupMsg').textContent='已导入 '+d.length+' 条记录。';
+      }catch(e){
+        $('backupMsg').textContent='这个文件读不出来，请选之前导出的备份文件。';
+      }
+      ev.target.value='';
+    };
+    fr.readAsText(f);
+  };
 
-  function saveTitleIfChanged(){
-    var t = (el.title.textContent||'').trim();
-    if (!t){ el.title.textContent = state.title; return; }
-    if (t !== state.title){
-      state.title = t;
-      saveState();
-    }
-  }
-
-  // ---- events ----
-  el.addBtn.onclick = function(){ openForm(null); };
-  el.formCancel.onclick = closeForm;
-  el.formSave.onclick = saveForm;
-  el.formDelete.onclick = function(){ if (editingId) deleteExpense(editingId); };
-  el.title.addEventListener('blur', saveTitleIfChanged);
-  el.title.addEventListener('keydown', function(ev){ if (ev.key==='Enter'){ ev.preventDefault(); el.title.blur(); } });
-
-  renderAll();
+  load();
+  render();
 })();
 </script>
 </body>
