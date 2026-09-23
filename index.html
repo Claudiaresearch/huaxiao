@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>旅行开支记录</title>
+<style>
+  :root{
+    --bg:#F4F5F7;
+    --surface:#FFFFFF;
+    --surface-2:#ECEEF2;
+    --ink:#1A2233;
+    --muted:#667085;
+    --border:#DFE3E9;
+    --accent:#0B7285;
+    --accent-ink:#075E6C;
+    --accent-soft:#E3F2F1;
+    --danger:#B42318;
+    --danger-soft:#FDEDEC;
+    --shadow:0 1px 2px rgba(20,24,33,.04),0 8px 24px -12px rgba(20,24,33,.12);
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#12161C; --surface:#1B2129; --surface-2:#232A33; --ink:#E7EAEE; --muted:#99A2AE;
+      --border:#2B323C; --accent:#3FB6C0; --accent-ink:#8FE0E6; --accent-soft:#163338;
+      --danger:#F97066; --danger-soft:#3A1917;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.5);
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12161C; --surface:#1B2129; --surface-2:#232A33; --ink:#E7EAEE; --muted:#99A2AE;
+    --border:#2B323C; --accent:#3FB6C0; --accent-ink:#8FE0E6; --accent-soft:#163338;
+    --danger:#F97066; --danger-soft:#3A1917;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.5);
+    color-scheme:dark;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);}
+  body{
+    padding:22px 18px 56px;
+    padding-top:calc(22px + env(safe-area-inset-top, 0px));
+    padding-bottom:calc(56px + env(safe-area-inset-bottom, 0px));
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Helvetica Neue',Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .num{font-variant-numeric:tabular-nums;}
+
+  .page{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:16px;}
+
+  .hero{
+    background:linear-gradient(155deg,var(--accent-soft),var(--surface) 62%);
+    border:1px solid var(--border); border-radius:20px; padding:20px 20px 18px; box-shadow:var(--shadow);
+  }
+  .eyebrow{margin:0 0 4px;font-size:12.5px;letter-spacing:.06em;color:var(--accent-ink);font-weight:600;text-transform:uppercase;}
+  h1{margin:0;font-size:clamp(22px,5vw,28px);font-weight:800;letter-spacing:-.01em;line-height:1.2;outline:none;}
+  h1:focus{background:var(--surface);border-radius:6px;box-shadow:0 0 0 2px var(--accent);}
+
+  .summary-grid{margin-top:16px;display:grid;grid-template-columns:1.3fr 1fr;gap:10px;}
+  .stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 14px 13px;min-width:0;}
+  .stat-label{font-size:11.5px;color:var(--muted);margin:0 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .stat-value{font-size:24px;font-weight:800;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .stat-sub{font-size:11px;color:var(--muted);margin-top:3px;}
+  @media (max-width:480px){ .summary-grid{grid-template-columns:1fr 1fr;} }
+
+  .breakdown{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+  .bd-row{display:grid;grid-template-columns:64px 1fr 74px;align-items:center;gap:10px;font-size:12.5px;}
+  .bd-name{color:var(--ink);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bd-bar-track{height:7px;border-radius:99px;background:var(--surface-2);overflow:hidden;}
+  .bd-bar-fill{height:100%;background:var(--accent);border-radius:99px;}
+  .bd-amt{text-align:right;color:var(--muted);}
+
+  .form-panel{
+    background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow);
+    display:flex;flex-direction:column;gap:12px;
+  }
+  .form-panel[hidden]{display:none;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .field{display:flex;flex-direction:column;gap:5px;min-width:0;}
+  .field label{font-size:12px;color:var(--muted);font-weight:600;}
+  .field input{
+    font:inherit;font-size:16px;padding:9px 10px;border-radius:9px;border:1px solid var(--border);
+    background:var(--bg);color:var(--ink);width:100%;
+  }
+  .field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .form-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;}
+  @media (max-width:480px){ .field-row{grid-template-columns:1fr;} }
+
+  .btn{
+    font:inherit;font-size:14px;font-weight:600;padding:9px 14px;border-radius:10px;border:1px solid var(--border);
+    background:var(--surface);color:var(--ink);cursor:pointer;
+  }
+  .btn:hover{border-color:var(--accent);}
+  .btn-primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .btn-primary:hover{filter:brightness(1.05);}
+  .btn-ghost{background:transparent;border-color:transparent;color:var(--muted);}
+  .btn-ghost:hover{color:var(--danger);}
+  .btn-danger{background:var(--danger-soft);border-color:var(--danger-soft);color:var(--danger);}
+
+  .toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;}
+  .chip{
+    font-size:12.5px;font-weight:600;padding:6px 12px;border-radius:999px;border:1px solid var(--border);
+    background:var(--surface);color:var(--muted);cursor:pointer;white-space:nowrap;
+  }
+  .chip.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+  .table-wrap{
+    background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);
+    overflow-x:auto;
+  }
+  table{border-collapse:collapse;width:100%;min-width:480px;}
+  thead th{
+    text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);
+    padding:12px 14px;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:700;
+  }
+  thead th.num-col,tbody td.num-col{text-align:right;}
+  tbody td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:var(--bg);}
+  .cat-badge{
+    display:inline-block;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;
+    background:var(--accent-soft);color:var(--accent-ink);white-space:nowrap;
+  }
+  .row-actions{display:flex;gap:4px;justify-content:flex-end;}
+  .row-actions button{
+    border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:13px;padding:4px 6px;border-radius:6px;
+  }
+  .row-actions button:hover{color:var(--accent);background:var(--accent-soft);}
+  .row-actions button.del:hover{color:var(--danger);background:var(--danger-soft);}
+  tfoot td{padding:12px 14px;font-weight:700;border-top:2px solid var(--border);font-size:14px;}
+
+  .empty-state{
+    text-align:center;color:var(--muted);font-size:14px;padding:36px 20px;background:var(--surface);
+    border:1px dashed var(--border);border-radius:16px;
+  }
+  .hint{font-size:12px;color:var(--muted);margin:2px 0 0;}
+  .footnote{text-align:center;font-size:11.5px;color:var(--muted);margin-top:4px;}
+  [hidden]{display:none!important;}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="hero">
+    <p class="eyebrow">旅行开支</p>
+    <h1 id="tripTitle" contenteditable="true" spellcheck="false"></h1>
+    <div class="summary-grid" id="summaryGrid"></div>
+  </header>
+
+  <section class="toolbar">
+    <div class="chips" id="categoryChips"></div>
+    <button class="btn btn-primary" id="addBtn">+ 记一笔</button>
+  </section>
+
+  <section class="form-panel" id="formPanel" hidden>
+    <div class="field-row">
+      <div class="field">
+        <label for="fDate">日期</label>
+        <input id="fDate" type="date">
+      </div>
+      <div class="field">
+        <label for="fCategory">类别</label>
+        <input id="fCategory" type="text" list="categoryOptions" placeholder="如：交通">
+        <datalist id="categoryOptions">
+          <option value="交通"><option value="住宿"><option value="餐饮">
+          <option value="门票"><option value="购物"><option value="其他">
+        </datalist>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="fItem">项目</label>
+        <input id="fItem" type="text" placeholder="如：机票">
+      </div>
+      <div class="field">
+        <label for="fAmount">金额（¥）</label>
+        <input id="fAmount" type="number" step="0.01" min="0" inputmode="decimal" class="num" placeholder="0.00">
+      </div>
+    </div>
+    <div class="field">
+      <label for="fNote">备注（可选）</label>
+      <input id="fNote" type="text" placeholder="选填">
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-danger" id="formDelete" hidden>删除这笔</button>
+      <button class="btn btn-ghost" id="formCancel">取消</button>
+      <button class="btn btn-primary" id="formSave">保存</button>
+    </div>
+  </section>
+
+  <section class="table-wrap" id="tableWrap" hidden>
+    <table>
+      <thead>
+        <tr><th>日期</th><th>类别</th><th>项目</th><th class="num-col">金额</th><th></th></tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+      <tfoot id="tableFoot"></tfoot>
+    </table>
+  </section>
+
+  <p class="empty-state" id="emptyState" hidden>还没有记录，点击上方"记一笔"开始。</p>
+  <p class="footnote">数据保存在这台设备的浏览器里，仅本机可见</p>
+</div>
+
+<script>
+(function(){
+  var STORAGE_KEY = 'trip-expense-tracker-v1';
+
+  // 首次打开时的初始数据（来自你已经记录的交通费用）；之后的增删改都只会写入本机浏览器存储。
+  var seedState = {
+    title: '旅行开支记录',
+    expenses: [
+      {id:'exp1', date:'2026-09-22', category:'交通', item:'机票', amount:1688, note:'', createdAt:'2026-09-22T00:00:01.000Z'},
+      {id:'exp2', date:'2026-09-22', category:'交通', item:'机票', amount:1430, note:'', createdAt:'2026-09-22T00:00:02.000Z'},
+      {id:'exp3', date:'2026-09-22', category:'交通', item:'高铁', amount:126,  note:'', createdAt:'2026-09-22T00:00:03.000Z'},
+      {id:'exp4', date:'2026-09-22', category:'交通', item:'高铁', amount:140,  note:'', createdAt:'2026-09-22T00:00:04.000Z'},
+      {id:'exp5', date:'2026-09-22', category:'交通', item:'接机', amount:99,   note:'', createdAt:'2026-09-22T00:00:05.000Z'},
+      {id:'exp6', date:'2026-09-22', category:'交通', item:'接机', amount:99,   note:'', createdAt:'2026-09-22T00:00:06.000Z'}
+    ]
+  };
+
+  var state = loadState();
+  var currentFilter = '全部';
+  var editingId = null;
+
+  var el = {
+    title: document.getElementById('tripTitle'),
+    summaryGrid: document.getElementById('summaryGrid'),
+    chips: document.getElementById('categoryChips'),
+    addBtn: document.getElementById('addBtn'),
+    formPanel: document.getElementById('formPanel'),
+    fDate: document.getElementById('fDate'),
+    fCategory: document.getElementById('fCategory'),
+    fItem: document.getElementById('fItem'),
+    fAmount: document.getElementById('fAmount'),
+    fNote: document.getElementById('fNote'),
+    formSave: document.getElementById('formSave'),
+    formCancel: document.getElementById('formCancel'),
+    formDelete: document.getElementById('formDelete'),
+    tableWrap: document.getElementById('tableWrap'),
+    tableBody: document.getElementById('tableBody'),
+    tableFoot: document.getElementById('tableFoot'),
+    emptyState: document.getElementById('emptyState'),
+  };
+
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw){
+        var parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.expenses)) return parsed;
+      }
+    }catch(err){ console.error(err); }
+    return JSON.parse(JSON.stringify(seedState));
+  }
+
+  function saveState(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    catch(err){ console.error(err); }
+  }
+
+  function fmtMoney(n){
+    n = Number(n)||0;
+    return '¥' + n.toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+  function todayStr(){
+    var d = new Date();
+    var m = String(d.getMonth()+1).padStart(2,'0');
+    var day = String(d.getDate()).padStart(2,'0');
+    return d.getFullYear()+'-'+m+'-'+day;
+  }
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function uid(){ return 'exp_' + Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+
+  function renderHeader(){
+    if (el.title.textContent !== state.title) el.title.textContent = state.title;
+  }
+
+  function renderSummary(){
+    var expenses = state.expenses;
+    var total = expenses.reduce(function(s,e){ return s + (Number(e.amount)||0); }, 0);
+    var byCat = {};
+    expenses.forEach(function(e){
+      var c = e.category || '其他';
+      byCat[c] = (byCat[c]||0) + (Number(e.amount)||0);
+    });
+    var cats = Object.keys(byCat).sort(function(a,b){ return byCat[b]-byCat[a]; });
+
+    var bdHtml = cats.map(function(c){
+      var pct = total > 0 ? Math.round(byCat[c]/total*100) : 0;
+      return '<div class="bd-row">' +
+        '<span class="bd-name">' + escapeHtml(c) + '</span>' +
+        '<span class="bd-bar-track"><span class="bd-bar-fill" style="width:' + pct + '%"></span></span>' +
+        '<span class="bd-amt num">' + fmtMoney(byCat[c]) + '</span>' +
+      '</div>';
+    }).join('');
+
+    el.summaryGrid.innerHTML =
+      '<div class="stat"><p class="stat-label">总花费</p><p class="stat-value num">' + fmtMoney(total) + '</p>' +
+        '<p class="stat-sub">共 ' + expenses.length + ' 笔</p>' +
+      '</div>' +
+      '<div class="stat"><p class="stat-label">分类占比</p>' +
+        (bdHtml ? '<div class="breakdown">' + bdHtml + '</div>' : '<p class="stat-sub">暂无记录</p>') +
+      '</div>';
+  }
+
+  function renderChips(){
+    var cats = [];
+    state.expenses.forEach(function(e){ if (e.category && cats.indexOf(e.category)===-1) cats.push(e.category); });
+    var all = ['全部'].concat(cats);
+    if (all.indexOf(currentFilter) === -1) currentFilter = '全部';
+    el.chips.innerHTML = '';
+    all.forEach(function(cat){
+      var b = document.createElement('button');
+      b.className = 'chip' + (cat===currentFilter ? ' active' : '');
+      b.textContent = cat;
+      b.onclick = function(){ currentFilter = cat; renderChips(); renderTable(); };
+      el.chips.appendChild(b);
+    });
+  }
+
+  function renderTable(){
+    var expenses = state.expenses;
+    var rows = expenses.filter(function(e){ return currentFilter==='全部' || e.category===currentFilter; });
+    rows = rows.slice().sort(function(a,b){
+      if (a.date !== b.date) return (a.date||'').localeCompare(b.date||'');
+      return (a.createdAt||'').localeCompare(b.createdAt||'');
+    });
+
+    el.tableWrap.hidden = expenses.length === 0;
+    el.emptyState.hidden = expenses.length !== 0;
+
+    el.tableBody.innerHTML = '';
+    rows.forEach(function(e){
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td>' + escapeHtml(e.date||'') + '</td>' +
+        '<td><span class="cat-badge">' + escapeHtml(e.category||'其他') + '</span></td>' +
+        '<td>' + escapeHtml(e.item||'') + (e.note ? '<div class="hint">'+escapeHtml(e.note)+'</div>' : '') + '</td>' +
+        '<td class="num-col num">' + fmtMoney(e.amount) + '</td>' +
+        '<td><div class="row-actions">' +
+          '<button class="edit" title="编辑">编辑</button>' +
+          '<button class="del" title="删除">删除</button>' +
+        '</div></td>';
+      tr.querySelector('.edit').onclick = function(){ openForm(e); };
+      tr.querySelector('.del').onclick = function(){ deleteExpense(e.id); };
+      el.tableBody.appendChild(tr);
+    });
+
+    var totalAmt = rows.reduce(function(s,e){ return s + (Number(e.amount)||0); },0);
+    if (rows.length){
+      el.tableFoot.innerHTML =
+        '<tr><td colspan="3">合计（' + rows.length + ' 笔）</td>' +
+        '<td class="num-col num">' + fmtMoney(totalAmt) + '</td><td></td></tr>';
+    } else {
+      el.tableFoot.innerHTML = '';
+    }
+  }
+
+  function renderAll(){
+    renderHeader();
+    renderSummary();
+    renderChips();
+    renderTable();
+  }
+
+  // ---- form (add / edit) ----
+  function openForm(existing){
+    editingId = existing ? existing.id : null;
+    el.fDate.value = existing ? existing.date : todayStr();
+    el.fCategory.value = existing ? existing.category : '';
+    el.fItem.value = existing ? existing.item : '';
+    el.fAmount.value = existing ? existing.amount : '';
+    el.fNote.value = existing ? (existing.note||'') : '';
+    el.formDelete.hidden = !existing;
+    el.formPanel.hidden = false;
+    el.fItem.focus();
+  }
+  function closeForm(){
+    el.formPanel.hidden = true;
+    editingId = null;
+  }
+
+  function saveForm(){
+    var data = {
+      date: el.fDate.value || todayStr(),
+      category: (el.fCategory.value||'其他').trim(),
+      item: (el.fItem.value||'').trim(),
+      amount: Math.round((Number(el.fAmount.value)||0) * 100) / 100,
+      note: (el.fNote.value||'').trim(),
+    };
+    if (!data.item || !data.amount){
+      el.fItem.focus();
+      return;
+    }
+    if (editingId){
+      var idx = state.expenses.findIndex(function(e){ return e.id===editingId; });
+      if (idx >= 0) state.expenses[idx] = Object.assign({}, state.expenses[idx], data);
+    } else {
+      data.id = uid();
+      data.createdAt = new Date().toISOString();
+      state.expenses.push(data);
+    }
+    saveState();
+    closeForm();
+    renderAll();
+  }
+
+  function deleteExpense(id){
+    state.expenses = state.expenses.filter(function(e){ return e.id !== id; });
+    saveState();
+    if (editingId === id) closeForm();
+    renderAll();
+  }
+
+  function saveTitleIfChanged(){
+    var t = (el.title.textContent||'').trim();
+    if (!t){ el.title.textContent = state.title; return; }
+    if (t !== state.title){
+      state.title = t;
+      saveState();
+    }
+  }
+
+  // ---- events ----
+  el.addBtn.onclick = function(){ openForm(null); };
+  el.formCancel.onclick = closeForm;
+  el.formSave.onclick = saveForm;
+  el.formDelete.onclick = function(){ if (editingId) deleteExpense(editingId); };
+  el.title.addEventListener('blur', saveTitleIfChanged);
+  el.title.addEventListener('keydown', function(ev){ if (ev.key==='Enter'){ ev.preventDefault(); el.title.blur(); } });
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
